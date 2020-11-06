@@ -32,3 +32,15 @@ rollback options:
 4. go back to 1
 
 Don't remove oob commands from the list, they might become valid at some point because of an earlier overlap
+
+## Find overlap 
+
+In the end, it will be a list of coordinates associated to time.
+
+As coordinates can easily be flatten, it would look like `List<Pair<Int, Int>>` per mower
+
+Could also be a matrix of dimensions highest number of turns and number of mowers
+
+But that matrix would anyway have to be constructed from all those lists.. Or maybe they use it as a shared memory ?
+
+I could also consider each move as a line, and the result as a geometric form, but meh... 
