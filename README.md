@@ -57,7 +57,10 @@ At the end of the simulation, the **final position and orientation of each mower
 When designing and implementing your solution ensure that you keep in mind separation of concerns, performance, and testing.
 
 ## Example
+
 Input file
+
+```
 5 5
 1 2 N
 LFLFLFLFF
@@ -66,3 +69,17 @@ FFRFFRFRRF
 Result
 1 3 N
 5 1 E
+```
+
+# Assumptions 
+
+## Should be discussed
+
+- Mowers have a fixed size of 1 ?
+- If two mowers plan to move on the same square next turn, both moves would be invalidated. A bit like platinium rift
+- They only care about the final position, not if they actually did their job ? Meh.
+- looks like we favor cpu consumption over memory consumption
+
+## Should be checked
+
+- The grid has a size of at least one.
