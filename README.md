@@ -1,48 +1,68 @@
-# lawn-and-mower project
+# Goal
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Build a program that implements the following mower specification.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+## Pitch
 
-## Running the application in dev mode
+The client, company X, wants to develop an algorithm to mow **rectangular surfaces**. 
+`A bit confusing as movements are actually already in the inputs`
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
-```
+Mowers can be programmed to move throughout the **entire surface**.
 
-## Packaging and running the application
+## Specs as given
+ 
+A mower's position is represented by **Cartesian coordinates (X, Y)**, and an **orientation (N, E, W, S)**.
 
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `lawn-and-mower-0.0.1-SNAPSHOT-runner.jar` file in the `/target` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
+The lawn is divided into a **grid** to simplify navigation.
 
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
+*For example, the position 0,0,N indicates the mower is in the lower left corner of the lawn facing north.*
 
-The application is now runnable using `java -jar target/lawn-and-mower-0.0.1-SNAPSHOT-runner.jar`.
+To move the mower, we use a series of a combination of the following **commands: L, R, and F**.
 
-## Creating a native executable
+**L** and **R** **turn** the mower 90° left or right **without moving** the mower.
+**F** means **move forward** one space in the direction the mower is currently facing without changing its orientation.
 
-You can create a native executable using: 
-```shell script
-./mvnw package -Pnative
-```
+If a forward movement would cause the mower to **move outside** of the lawn, the mower **remains** in the position **and** this **command is discarded**.
+ 
+The position directly to the north of *(X, Y)* is *(X, Y+ 1)* and the position to the east of *(X, Y)* is *(X + 1, Y)*.
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
+Different mowers may **not occupy the same space at the same time**,
+ and if a mower receives a **move forward** instruction that would cause it to **run into another mower**,
+ the move forward instruction is **silently discarded**.
+ 
+`assumption here: as seen later, moves can be run in //, they would both not move to this space ?`
 
-You can then execute your native executable with: `./target/lawn-and-mower-0.0.1-SNAPSHOT-runner`
+Your simulation will be run on a machine with multiple CPUs so multiple **mowers should be processed simultaneously** in order to speed up the overall execution time.
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
+## Inputs
 
-# Command Mode
+The mowers are programmed using an input **file** constructed in the following manner:
 
-Guide: https://quarkus.io/guides/command-mode-reference
+The **first line** corresponds to the **upper right corner of the lawn**.
+The **bottom left** corner is implicitly **(0, 0)**.
+
+The rest of the file describes the **multiple mowers** that are on the lawn.
+Each **mower** is described on **two lines**:
+
+The **first** line contains the mower's **starting position and orientation** in the format "X Y O". `with a space`
+X and Y are the coordinates and O is the orientation.
+
+The **second** line contains the instructions for the mower to **navigate the lawn**.
+The instructions are **not separated by spaces**.
+
+## Output
+
+At the end of the simulation, the **final position and orientation of each mower is output in the order that the mower appeared in the input**.
+
+When designing and implementing your solution ensure that you keep in mind separation of concerns, performance, and testing.
+
+## Example
+Input file
+5 5
+1 2 N
+LFLFLFLFF
+3 3 E
+FFRFFRFRRF
+Result
+1 3 N
+5 1 E
