@@ -1,4 +1,4 @@
-package lam.data;
+package lam.enums;
 
 public enum Direction {
 

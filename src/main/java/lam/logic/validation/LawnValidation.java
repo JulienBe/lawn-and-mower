@@ -1,9 +1,7 @@
-package lam.validation;
+package lam.logic.validation;
 
-import lam.data.Lawn;
+import lam.records.Lawn;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 public class LawnValidation {
     public boolean isValid(@NotNull Lawn lawn) {
