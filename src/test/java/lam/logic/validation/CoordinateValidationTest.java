@@ -1,7 +1,7 @@
-package lam.validation;
+package lam.logic.validation;
 
-import lam.data.Coordinate;
-import lam.data.Lawn;
+import lam.records.Coordinate;
+import lam.records.Lawn;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
