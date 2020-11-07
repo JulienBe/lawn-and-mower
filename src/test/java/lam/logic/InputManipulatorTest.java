@@ -4,51 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class InputManipulatorTest {
 
-    String[] invalidStrings = {
-            """
-            
-            """,
-
-            """
-            mass
-            effect            
-            """,
-
-            """
-            2 1
-            8 3 W
-            mef
-            """,
-
-            """
-            0 2
-            0 1 E,
-            """,
-
-            """
-            3 3
-            1 1 S
-             
-            """,
-
-            """
-            -1 10
-            0 5 N
-            L
-            """,
-
-            """
-            5 5
-            1 2 N
-            LFLFLFLFF
-            3 3 E
-            
-            """,
-    };
     String[] lawns = {"2 1", "5 5", "66 30"};
     String[] mowers = {
             """
@@ -71,19 +31,19 @@ class InputManipulatorTest {
             LFRLFRLFLFLRFLRLFLRLFLRLFLRLFLRLF""",
     };
 
+
     @Test
     void invalidString() {
-        assertThrows(IllegalArgumentException.class, () -> InputManipulator.isValidInput(""));
-        Arrays.stream(invalidStrings).parallel().forEach(s ->
-                assertFalse(InputManipulator.isValidInput(s))
+        new TestUtilities().getInvalids().parallelStream().forEach(s ->
+                assertThrows(IllegalArgumentException.class, () -> InputManipulator.validateInput(s))
         );
     }
 
     @Test
     void isValidInput() {
-        assertTrue(InputManipulator.isValidInput(lawns[0] + "\n" + mowers[0]));
-        assertTrue(InputManipulator.isValidInput(lawns[1] + "\n" + mowers[1] + "\n" + mowers[2]));
-        assertTrue(InputManipulator.isValidInput(lawns[2] + "\n" + mowers[3] + "\n" + mowers[4] + "\n" + mowers[5]));
+        InputManipulator.validateInput(lawns[0] + "\n" + mowers[0]);
+        InputManipulator.validateInput(lawns[1] + "\n" + mowers[1] + "\n" + mowers[2]);
+        InputManipulator.validateInput(lawns[2] + "\n" + mowers[3] + "\n" + mowers[4] + "\n" + mowers[5]);
     }
 
     @Test

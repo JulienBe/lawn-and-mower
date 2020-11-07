@@ -3,60 +3,90 @@ package lam.logic;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class InputManipulator {
 
     private static final Logger LOG = Logger.getLogger(InputManipulator.class);
-    private static final String LAWN_REGEX = "[0-9]+ [0-9]+";
-    private static final String MOWER_REGEX = "[0-9]+ [0-9]+ [N|E|S|W]";
-    private static final String INSTRUCTIONS_REGEX = "[L|R|F]+";
+    private static final String SEPARATOR = " ";
+    private static final String COORD_REGEX = "[0-9]+";
+    private static final String COORDS_REGEX = "^" + COORD_REGEX + SEPARATOR + COORD_REGEX;
+    private static final String DIR_REGEX = "[N|E|S|W]";
+    private static final String MOWER_REGEX = COORDS_REGEX + SEPARATOR + DIR_REGEX;
+    private static final String INSTRUCTIONS_REGEX = "^[L|R|F]+";
     private static final String NEW_LINE_REGEX = "\\R";
-    private static final Pattern validInput = Pattern.compile(LAWN_REGEX + "(" + NEW_LINE_REGEX + MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX + ")+");
-    private static final Pattern lawnSplitter = Pattern.compile(LAWN_REGEX + NEW_LINE_REGEX);
-    private static final Pattern mowerSplitter = Pattern.compile(MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX);
+    private static final Pattern validFilePattern = Pattern.compile(COORDS_REGEX + "(" + NEW_LINE_REGEX + MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX + ")+", Pattern.MULTILINE);
+    private static final Pattern lawnPattern = Pattern.compile(COORDS_REGEX + NEW_LINE_REGEX, Pattern.MULTILINE);
+    private static final Pattern mowerPattern = Pattern.compile(MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX, Pattern.MULTILINE);
+    private static final Pattern coordPattern = Pattern.compile(COORD_REGEX, Pattern.MULTILINE);
+    private static final Pattern dirPattern = Pattern.compile(DIR_REGEX, Pattern.MULTILINE);
+    private static final Pattern instPattern = Pattern.compile(INSTRUCTIONS_REGEX, Pattern.MULTILINE);
+
 
     private InputManipulator() {}
 
-    public static String extractLawn(@NotNull String s) {
-        s = cleanInput(s);
-        final Matcher matcher = lawnSplitter.matcher(s);
-        if (matcher.find())
-            return matcher.group(0).split(NEW_LINE_REGEX)[0];
-        throw illegalString(s, "Lawn could not be extract according to pattern " + lawnSplitter.pattern() + "\tConsider checking with https://www.freeformatter.com/java-regex-tester.html");
+    public static @NotNull String extractDirection(@NotNull String s) {
+        return getFirstOnList(extractAllMatching(s, dirPattern));
+    }
+    public static @NotNull String extractLawn(@NotNull String s) {
+        return getFirstOnList(extractAllMatching(s, lawnPattern));
+    }
+    public static @NotNull String extractInstructions(@NotNull String s) {
+        return getFirstOnList(extractAllMatching(s, instPattern));
+    }
+    public static @NotNull List<String> extractCoord(@NotNull String s) {
+        return extractAllMatching(s, coordPattern);
+    }
+    public static @NotNull List<String> extractMowers(@NotNull String s) {
+        return extractAllMatching(s, mowerPattern);
     }
 
-    public static List<String> extractMowers(@NotNull String s) {
-        s = cleanInput(s);
-        final Matcher matcher = mowerSplitter.matcher(s);
-        List<String> mowers = new ArrayList<>();
-        while (matcher.find())
-            mowers.add(matcher.group());
-        if (!mowers.isEmpty())
-            return mowers;
-        throw illegalString(s, "Mower could not be extract according to pattern " + mowerSplitter.pattern() + "\tConsider checking with https://www.freeformatter.com/java-regex-tester.html");
+    private static @NotNull String getFirstOnList(@NotNull List<String> list) {
+        return cleanInput(list.get(0));
+    }
+    /**
+     * throws and log an error if it's invalid
+     * @return
+     */
+    public static @NotNull String validateInput(@NotNull String wholeInput) {
+        wholeInput = cleanInput(wholeInput);
+        if (splitPerNewLine(getFirstOnList(extractAllMatching(wholeInput, validFilePattern))).length == splitPerNewLine(wholeInput).length)
+            return wholeInput;
+        throw illegalString(wholeInput, "Sorry, your input is invalid" + patternErrorStr(validFilePattern));
     }
 
-    public static boolean isValidInput(@NotNull String s) {
-        if (s.isEmpty())
-            throw illegalString(s, "Empty String");
-        return validInput.matcher(cleanInput(s)).matches();
+    public static @NotNull String[] splitPerNewLine(String s) {
+        return s.split(NEW_LINE_REGEX);
+    }
+
+    private static @NotNull List<String> extractAllMatching(@NotNull String s, @NotNull Pattern pattern) {
+        s = cleanInput(s);
+        final List<String> occurrences = pattern.matcher(s)
+                .results()
+                .map(MatchResult::group)
+                .collect(Collectors.toList());
+        if (!occurrences.isEmpty())
+            return occurrences;
+        throw illegalString(s, "Extraction failed" + patternErrorStr(mowerPattern));
     }
 
     /**
      * Just to be a bit kind
      */
-    private static String cleanInput(String s) {
+    private static @NotNull String cleanInput(String s) {
         return s.strip().toUpperCase();
     }
 
-    private static IllegalArgumentException illegalString(String s, String error) {
-        String errorMsg = "Trying to create an invalid simulation. \n " + error + "\ngot : \n" + s;
+    private static @NotNull IllegalArgumentException illegalString(String s, String error) {
+        String errorMsg = "Trying to create an invalid simulation. \n " + error + "\ngot : \n" + s + "end of what we got";
         LOG.error(errorMsg);
         return new IllegalArgumentException(errorMsg);
     }
 
+    private static @NotNull String patternErrorStr(Pattern pattern) {
+        return " according to pattern " + pattern.pattern() + "\tConsider checking with https://www.freeformatter.com/java-regex-tester.html";
+    }
 }
