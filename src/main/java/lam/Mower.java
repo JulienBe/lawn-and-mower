@@ -63,6 +63,9 @@ public class Mower {
         // what if it gets modified when processFrom is called...
         return Collections.unmodifiableList(states); // ho gosh that accessibility management...
     }
+    public @NotNull MowerState lastState() {
+        return states.get(states.size() - 1);
+    }
 
     @Override
     public boolean equals(Object o) {
