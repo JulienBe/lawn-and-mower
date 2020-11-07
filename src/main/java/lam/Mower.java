@@ -27,7 +27,10 @@ public class Mower {
     public Mower(@NotNull Coordinate initialCoordinate, @NotNull Direction dir, @NotNull List<Instruction> instructions, @NotNull Lawn lawn) {
         this.instructions.addAll(instructions);
         this.lawn = lawn;
-        states.add(new MowerState(dir, initialCoordinate, 0));
+        var initialState = new MowerState(dir, initialCoordinate, 0);
+        if (!isValid(initialState))
+            throw new IllegalArgumentException("The mower has been initialized outside of the lawn.\n Given: " + initialCoordinate + "\n on lawn " + lawn);
+        states.add(initialState);
     }
 
     /**
@@ -50,12 +53,16 @@ public class Mower {
         while (nextState.nextInstructionCpt() < instructions.size()) {
             var instruction = instructions.get(nextState.nextInstructionCpt());
             var stateCandidate = instruction.exec.apply(states.get(states.size() - 1));
-            if (CoordinateValidation.isValid(stateCandidate.coord(), lawn))
+            if (isValid(stateCandidate))
                 nextState = stateCandidate;
             else
                 nextState = new MowerState(nextState.dir(), nextState.coord(), nextState.nextInstructionCpt() + 1);
             states.add(nextState);
         }
+    }
+
+    private boolean isValid(@NotNull MowerState stateCandidate) {
+        return CoordinateValidation.isValid(stateCandidate.coord(), lawn);
     }
 
     @Unmodifiable
