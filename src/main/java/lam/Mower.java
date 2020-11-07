@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.jboss.logging.Logger;
 
@@ -63,4 +64,17 @@ public class Mower {
         return Collections.unmodifiableList(states); // ho gosh that accessibility management...
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Mower)) return false;
+        Mower mower = (Mower) o;
+        return instructions.equals(mower.instructions) &&
+                lawn.equals(mower.lawn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(instructions, lawn);
+    }
 }
