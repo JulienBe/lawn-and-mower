@@ -9,9 +9,7 @@ class LawnValidationTest {
 
     @Test
     void nullTest() {
-        assertThrows(IllegalArgumentException.class,  () -> {
-            new LawnValidation().isValid(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new LawnValidation().isValid(null));
     }
 
     @Test

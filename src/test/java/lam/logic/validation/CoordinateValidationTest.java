@@ -10,12 +10,8 @@ class CoordinateValidationTest {
 
     @Test
     void nullTest() {
-        assertThrows(IllegalArgumentException.class,  () -> {
-            CoordinateValidation.isValid(null, new Lawn(1, 1));
-        });
-        assertThrows(IllegalArgumentException.class,  () -> {
-            CoordinateValidation.isValid(new Coordinate(1, 1), null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> CoordinateValidation.isValid(null, new Lawn(1, 1)));
+        assertThrows(IllegalArgumentException.class, () -> CoordinateValidation.isValid(new Coordinate(1, 1), null));
     }
 
     @Test
