@@ -23,7 +23,7 @@ public class Mower {
     private final List<Instruction> instructions = new LinkedList<>();
     private final List<MowerState> states = new LinkedList<>();
     private final Lawn lawn;
-    private final int index;
+    public final int index;
 
     public Mower(@NotNull Coordinate initialCoordinate, @NotNull Direction dir, @NotNull List<Instruction> instructions, @NotNull Lawn lawn, int index) {
         this.instructions.addAll(instructions);
@@ -63,6 +63,12 @@ public class Mower {
         }
     }
 
+    public void removeInstruction(int i) {
+        if (i < 0 || i >= instructions.size())
+            throw new IllegalArgumentException("Cannot remove instruction " + i + " number of instructions: " + instructions.size());
+        instructions.remove(i);
+    }
+
     private boolean isValid(@NotNull MowerState stateCandidate) {
         return CoordinateValidation.isValid(stateCandidate.coord(), lawn);
     }
@@ -89,4 +95,5 @@ public class Mower {
     public int hashCode() {
         return Objects.hash(instructions, lawn);
     }
+
 }
