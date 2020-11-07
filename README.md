@@ -66,7 +66,11 @@ Input file
 LFLFLFLFF
 3 3 E
 FFRFFRFRRF
+```
+
 Result
+
+```
 1 3 N
 5 1 E
 ```
