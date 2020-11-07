@@ -8,6 +8,7 @@ import lam.records.Lawn;
 import lam.records.MowingSession;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,15 +37,17 @@ public class InputParser {
     }
 
     private static @NotNull List<Mower> convertMowerStrings(@NotNull String input, @NotNull Lawn lawn) {
-        // order need to be kept for output
-        return InputManipulator.extractMowers(input)
-                .stream()
-                .map(s -> parseMowerLine(lawn, s))
-                .collect(Collectors.toList());
+        List<Mower> mowers = new ArrayList<>();
+        // trying to refrain from adding external libs as much as possible... Need a stream with index here
+        var mowerStrings = InputManipulator.extractMowers(input);
+        for (int i = 0; i < mowerStrings.size(); i++) {
+            mowers.add(parseMowerLine(lawn, mowerStrings.get(i), i));
+        }
+        return mowers;
     }
 
     @NotNull
-    private static Mower parseMowerLine(@NotNull Lawn lawn, String s) {
+    private static Mower parseMowerLine(@NotNull Lawn lawn, String s, int index) {
         String[] lines = InputManipulator.splitPerNewLine(s);
 
         List<Integer> coord = InputManipulator.extractCoord(lines[0])
@@ -58,7 +61,7 @@ public class InputParser {
                 .map(instructionMapping::get)
                 .collect(Collectors.toList());
 
-        return new Mower(new Coordinate(coord.get(0), coord.get(1)), dir, instructions, lawn);
+        return new Mower(new Coordinate(coord.get(0), coord.get(1)), dir, instructions, lawn, index);
     }
 
     private static @NotNull Lawn convertLawnString(@NotNull String input) {

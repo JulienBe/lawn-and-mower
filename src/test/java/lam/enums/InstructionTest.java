@@ -11,7 +11,7 @@ class InstructionTest {
     @Test
     void turnDoesntMove() {
         final Coordinate initialCoord = new Coordinate(4, 5);
-        final MowerState initialState = new MowerState(Direction.E, initialCoord, 0);
+        final MowerState initialState = new MowerState(Direction.E, initialCoord, 0, 0);
 
         assertEquals(initialCoord, Instruction.L.exec.apply(initialState).coord());
         assertEquals(initialCoord, Instruction.R.exec.apply(initialState).coord());
@@ -20,7 +20,7 @@ class InstructionTest {
     @Test
     void turnDoesTurn() {
         final Coordinate initialCoord = new Coordinate(77, 88);
-        final MowerState initialState = new MowerState(Direction.N, initialCoord, 0);
+        final MowerState initialState = new MowerState(Direction.N, initialCoord, 0, 0);
 
         assertEquals(Direction.W, Instruction.L.exec.apply(initialState).dir());
         assertEquals(Direction.E, Instruction.R.exec.apply(initialState).dir());
@@ -29,7 +29,7 @@ class InstructionTest {
     @Test
     void moveDoesNotTurn() {
         final Coordinate initialCoord = new Coordinate(21, 83);
-        final MowerState initialState = new MowerState(Direction.S, initialCoord, 0);
+        final MowerState initialState = new MowerState(Direction.S, initialCoord, 0, 0);
 
         assertEquals(Direction.S, Instruction.F.exec.apply(initialState).dir());
     }
@@ -37,7 +37,7 @@ class InstructionTest {
     @Test
     void moveDoesMove() {
         final Coordinate initialCoord = new Coordinate(21, 83);
-        final MowerState initialState = new MowerState(Direction.S, initialCoord, 0);
+        final MowerState initialState = new MowerState(Direction.S, initialCoord, 0, 0);
 
         final MowerState movedSouth = Instruction.F.exec.apply(initialState);
         assertEquals(new Coordinate(21, 82), movedSouth.coord());
@@ -46,7 +46,7 @@ class InstructionTest {
         final MowerState movedEastAgain = Instruction.F.exec.apply(movedEast);
         assertEquals(new Coordinate(23, 82), movedEastAgain.coord());
 
-        assertEquals(new MowerState(Direction.W, new Coordinate(5, 40), 0), Instruction.F.exec.apply(new MowerState(Direction.W, new Coordinate(6, 40), 0)));
+        assertEquals(new MowerState(Direction.W, new Coordinate(5, 40), 1, 0), Instruction.F.exec.apply(new MowerState(Direction.W, new Coordinate(6, 40), 0, 0)));
     }
 
 }

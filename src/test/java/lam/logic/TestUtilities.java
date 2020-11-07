@@ -25,8 +25,8 @@ public class TestUtilities {
 
     public static MowingSession getExampleSession() {
         Lawn lawn = new Lawn(6, 6);
-        Mower mower1 = new Mower(new Coordinate(1, 2), Direction.N, Arrays.asList(L,F,L,F,L,F,L,F,F), lawn);
-        Mower mower2 = new Mower(new Coordinate(3, 3), Direction.E, Arrays.asList(F,F,R,F,F,R,F,R,R,F), lawn);
+        Mower mower1 = new Mower(new Coordinate(1, 2), Direction.N, Arrays.asList(L,F,L,F,L,F,L,F,F), lawn, 0);
+        Mower mower2 = new Mower(new Coordinate(3, 3), Direction.E, Arrays.asList(F,F,R,F,F,R,F,R,R,F), lawn, 1);
         return new MowingSession(lawn, Arrays.asList(mower1, mower2));
     }
 

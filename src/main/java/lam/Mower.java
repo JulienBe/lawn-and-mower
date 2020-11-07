@@ -23,11 +23,13 @@ public class Mower {
     private final List<Instruction> instructions = new LinkedList<>();
     private final List<MowerState> states = new LinkedList<>();
     private final Lawn lawn;
+    private final int index;
 
-    public Mower(@NotNull Coordinate initialCoordinate, @NotNull Direction dir, @NotNull List<Instruction> instructions, @NotNull Lawn lawn) {
+    public Mower(@NotNull Coordinate initialCoordinate, @NotNull Direction dir, @NotNull List<Instruction> instructions, @NotNull Lawn lawn, int index) {
         this.instructions.addAll(instructions);
         this.lawn = lawn;
-        var initialState = new MowerState(dir, initialCoordinate, 0);
+        this.index = index;
+        var initialState = new MowerState(dir, initialCoordinate, 0, index);
         if (!isValid(initialState))
             throw new IllegalArgumentException("The mower has been initialized outside of the lawn.\n Given: " + initialCoordinate + "\n on lawn " + lawn);
         states.add(initialState);
@@ -56,7 +58,7 @@ public class Mower {
             if (isValid(stateCandidate))
                 nextState = stateCandidate;
             else
-                nextState = new MowerState(nextState.dir(), nextState.coord(), nextState.nextInstructionCpt() + 1);
+                nextState = new MowerState(nextState.dir(), nextState.coord(), nextState.nextInstructionCpt() + 1, index);
             states.add(nextState);
         }
     }
