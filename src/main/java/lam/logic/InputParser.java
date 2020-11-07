@@ -64,7 +64,7 @@ public class InputParser {
     private static @NotNull Lawn convertLawnString(@NotNull String input) {
         String lawnStr = InputManipulator.extractLawn(input);
         List<String> dimensions = InputManipulator.extractCoord(lawnStr);
-        return new Lawn(parseInt(dimensions.get(0)), parseInt(dimensions.get(1)));
+        return new Lawn(parseInt(dimensions.get(0)) + 1, parseInt(dimensions.get(1)) + 1);
     }
 
     private static int parseInt(@NotNull String s) {
