@@ -16,15 +16,13 @@ public class InputManipulator {
     private static final String COORDS_REGEX = "^" + COORD_REGEX + SEPARATOR + COORD_REGEX;
     private static final String DIR_REGEX = "[N|E|S|W]";
     private static final String MOWER_REGEX = COORDS_REGEX + SEPARATOR + DIR_REGEX;
-    private static final String INSTRUCTIONS_REGEX = "^[L|R|F]+";
+    private static final String INSTRUCTIONS_REGEX = "^[L|R|F]+$";
     private static final String NEW_LINE_REGEX = "\\R";
-    private static final Pattern validFilePattern = Pattern.compile(COORDS_REGEX + "(" + NEW_LINE_REGEX + MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX + ")+", Pattern.MULTILINE);
+    private static final Pattern validContentPattern = Pattern.compile(COORDS_REGEX + "(" + NEW_LINE_REGEX + MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX + ")+", Pattern.MULTILINE);
     private static final Pattern lawnPattern = Pattern.compile(COORDS_REGEX + NEW_LINE_REGEX, Pattern.MULTILINE);
     private static final Pattern mowerPattern = Pattern.compile(MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX, Pattern.MULTILINE);
     private static final Pattern coordPattern = Pattern.compile(COORD_REGEX, Pattern.MULTILINE);
     private static final Pattern dirPattern = Pattern.compile(DIR_REGEX, Pattern.MULTILINE);
-    private static final Pattern instPattern = Pattern.compile(INSTRUCTIONS_REGEX, Pattern.MULTILINE);
-
 
     private InputManipulator() {}
 
@@ -33,9 +31,6 @@ public class InputManipulator {
     }
     public static @NotNull String extractLawn(@NotNull String s) {
         return getFirstOnList(extractAllMatching(s, lawnPattern));
-    }
-    public static @NotNull String extractInstructions(@NotNull String s) {
-        return getFirstOnList(extractAllMatching(s, instPattern));
     }
     public static @NotNull List<String> extractCoord(@NotNull String s) {
         return extractAllMatching(s, coordPattern);
@@ -47,15 +42,15 @@ public class InputManipulator {
     private static @NotNull String getFirstOnList(@NotNull List<String> list) {
         return cleanInput(list.get(0));
     }
+
     /**
      * throws and log an error if it's invalid
-     * @return
      */
     public static @NotNull String validateInput(@NotNull String wholeInput) {
         wholeInput = cleanInput(wholeInput);
-        if (splitPerNewLine(getFirstOnList(extractAllMatching(wholeInput, validFilePattern))).length == splitPerNewLine(wholeInput).length)
+        if (splitPerNewLine(getFirstOnList(extractAllMatching(wholeInput, validContentPattern))).length == splitPerNewLine(wholeInput).length)
             return wholeInput;
-        throw illegalString(wholeInput, "Sorry, your input is invalid" + patternErrorStr(validFilePattern));
+        throw illegalString(wholeInput, "Sorry, your input is invalid" + patternErrorStr(validContentPattern));
     }
 
     public static @NotNull String[] splitPerNewLine(String s) {

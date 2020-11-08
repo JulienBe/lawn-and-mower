@@ -55,7 +55,7 @@ public class InputParser {
                 .map(InputParser::parseInt)
                 .collect(Collectors.toList());
         Direction dir = directionMapping.get(InputManipulator.extractDirection(lines[0]));
-        List<Instruction> instructions = InputManipulator.extractInstructions(lines[1])
+        List<Instruction> instructions = lines[1]
                 .chars()
                 .mapToObj(value -> (char) value)
                 .map(instructionMapping::get)
