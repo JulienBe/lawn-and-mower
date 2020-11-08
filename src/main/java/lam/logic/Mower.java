@@ -1,4 +1,4 @@
-package lam;
+package lam.logic;
 
 import lam.enums.Direction;
 import lam.enums.Instruction;

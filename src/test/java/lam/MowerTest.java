@@ -1,6 +1,7 @@
 package lam;
 
 import lam.enums.Direction;
+import lam.logic.Mower;
 import lam.records.Coordinate;
 import lam.records.Lawn;
 import lam.records.MowerState;

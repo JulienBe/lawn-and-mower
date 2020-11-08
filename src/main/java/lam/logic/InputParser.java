@@ -1,7 +1,5 @@
 package lam.logic;
 
-import lam.CollisionDetector;
-import lam.Mower;
 import lam.enums.Direction;
 import lam.enums.Instruction;
 import lam.records.Coordinate;

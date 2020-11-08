@@ -1,6 +1,6 @@
 package lam.records;
 
-import lam.Mower;
+import lam.logic.Mower;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

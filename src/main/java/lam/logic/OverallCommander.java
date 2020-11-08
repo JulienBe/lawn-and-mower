@@ -1,4 +1,4 @@
-package lam;
+package lam.logic;
 
 import lam.records.MowerState;
 import lam.records.MowingSession;
