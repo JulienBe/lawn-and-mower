@@ -1,3 +1,20 @@
+# Compile it
+
+Using `mvn`, `./mvnw` or even `./mvnw.cmd` depending on your platform.
+
+You need at least Java 15 to compile or run it
+
+`mvn clean package` will run the tests and produce:
+ - a small jar at `target/lawn-and-mower-1.0.0-runner.jar.original` (< 30k) 
+ - a fat jar at `target/lawn-and-mower-1.0.0-runner.jar` (< 3m) 
+
+`mvn clean package -Dquarkus.container-image.build=true` will produce a docker image named `lawn-and-mower` with tag `1.0.0`
+
+`mvn compile quarkus:dev` will compile into dev mode for fast rerun when you modify something
+
+### CLI mode
+
+
 # Goal
 
 Build a program that implements the following mower specification.
@@ -87,3 +104,14 @@ Result
 ## Should be checked
 
 - The grid has a size of at least one.
+
+# Todos
+
+- add picocli
+- add option to write result at the end of file
+- add useful rest endpoint 
+- check on non linux machines
+- deploy
+- check not logged to dockerhub
+- asciinema
+- deliverables
