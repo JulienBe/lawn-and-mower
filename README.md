@@ -19,8 +19,36 @@ You can also process multiple files, enter a multiline string. See `mow.sh`
 
 Tips: you can generate random data with the regex at https://onlinerandomtools.com/generate-random-data-from-regexp
 
-### CLI mode
+# Run it
 
+### Jar
+
+Other than the 'compile' options, you can use the jars (fat and slim) located into the deliverables folder.
+
+As previously stated, you will need at least java 15
+
+You can either run it with:
+- `no arguments` : `java --enable-preview -jar deliverables/chosen.jar`. It will then run the given example and any file located at `/opt/lawn_and_mower/inputs/`
+- `file as argument` : add for example `"test_inputs/huge_lawn"` after the previous run command. Will **not** run files located at the default input folder
+
+### Docker
+
+You can run the docker image and mount a volume pointing to your files: `docker run -v path_inputs:/opt/lawn_and_mower/inputs/ julienbe/lawn-and-mower:1.0.0`
+
+### Output
+
+In any case, the output will be in the logs
+If you run it in 'folder mode' (no arguments) it will also try to write the corresponding output to a file in `/opt/lawn_and_mower/ouputs`
+For the docker version, you can also mount it as a volume with `docker run -v path_inputs:/opt/lawn_and_mower/inputs/ output_folder:/opt/lawn_and_mower/inputs/ julienbe/lawn-and-mower:1.0.0`
+
+*It's using user id 1001*
+
+### Example
+
+- build : https://asciinema.org/a/1eSrZO4a8Oo4qjIabejVc7S9M
+- docker : https://asciinema.org/a/v68vTeqRZAsDyGdiaa2cWjVKJ
+- jar : https://asciinema.org/a/4fSvq8oOU4CMJM1gC7Ie6kcoU
+- moo.sh : https://asciinema.org/a/WHB3u482XA7s50Pj6EMYxoHAh
 
 # Goal
 
@@ -118,7 +146,7 @@ Result
 - check on non linux machines
 - deploy
 - check not logged to dockerhub
-- asciinema
+- ~~asciinema~~
 - deliverables
 - ~~bench~~
 - ~~damn regex doing a stackoverflow~~
