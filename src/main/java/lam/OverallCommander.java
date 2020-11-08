@@ -2,9 +2,11 @@ package lam;
 
 import lam.records.MowerState;
 import lam.records.MowingSession;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class OverallCommander {
@@ -14,74 +16,61 @@ public class OverallCommander {
         this.session = session;
     }
 
-    public void exec() {
-        List<MowerState> collisions;
+    public List<String> exec() {
+        List<MowerState> allCollidingStates;
         do {
-            // TODO: don't start from scratch either
-            runFrom(0);
-            List<List<MowerState>> paths = session
+            session.mowers()
+                    .parallelStream()
+                    .forEach(Mower::processFromLastState);
+
+            List<List<MowerState>> allMowersPaths = session
                     .mowers()
                     .parallelStream()
                     .map(Mower::getStates)
                     .collect(Collectors.toList());
-            int longest = paths
+
+            int longestPathLength = allMowersPaths
                     .parallelStream()
                     .mapToInt(List::size)
                     .max()
                     .getAsInt();
-            collisions = detectEarliestCollision(paths, longest);
-            collisions
+            allCollidingStates = detectEarliestCollision(allMowersPaths, longestPathLength);
+
+            allCollidingStates
                     .parallelStream()
-                    .forEach(mowerState -> {
-                        handleCollisionState(mowerState, session.mowers());
-                    });
-        } while (!collisions.isEmpty());
+                    .forEach(mowerState -> handleCollisionState(mowerState, session.mowers()));
+        } while (!allCollidingStates.isEmpty());
+        return session.mowers()
+                .stream()
+                .map(Mower::lastState)
+                .map(state -> state.coord().x() + " " + state.coord().y() + " " + state.dir())
+                .collect(Collectors.toList());
     }
 
     private void handleCollisionState(MowerState mowerState, List<Mower> mowers) {
         var collidingMower = mowers.get(mowerState.mowerIndex());
-        collidingMower.removeInstruction(mowerState.nextInstructionCpt() - 1);
+        collidingMower.skipInstruction(mowerState);
     }
 
     // TODO: don't start from scratch each time
     private List<MowerState> detectEarliestCollision(List<List<MowerState>> paths, int longest) {
         for (int turn = 0; turn < longest; turn++) {
-            int currentTurn = turn;
             List<MowerState> turnsToCompare = paths
                     .parallelStream()
-                    .filter(p -> p.size() > currentTurn)
-                    .map(p -> p.get(currentTurn))
+                    .map(getCorrespondingState(turn))
                     .collect(Collectors.toList());
 
             if (turnsToCompare.size() <= 1)
                 break;
 
-            var collisionList = isThereACollision(turnsToCompare);
+            var collisionList = new CollisionDetector().isThereACollision(turnsToCompare);
             if (!collisionList.isEmpty())
                 return collisionList;
         }
         return Collections.emptyList();
     }
 
-    private List<MowerState> isThereACollision(List<MowerState> turns) {
-        return turns
-                .parallelStream()
-                .collect(Collectors.groupingBy(MowerState::coord))
-                .values().parallelStream()
-                .filter(listAtThisCoord -> listAtThisCoord.size() > 1)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-    }
-
-    private void runFrom(int from) {
-        session.mowers()
-                .parallelStream()
-                .forEach(m -> m.processFrom(from));
-    }
-    public List<MowerState> results() {
-        return session.mowers()
-                .stream()
-                .map(Mower::lastState)
-                .collect(Collectors.toList());
+    private @NotNull Function<List<MowerState>, MowerState> getCorrespondingState(int currentTurn) {
+        return p -> p.get(Math.min(currentTurn, p.size() - 1));
     }
 }

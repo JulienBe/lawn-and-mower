@@ -1,10 +1,12 @@
 package lam.logic;
 
+import lam.CollisionDetector;
 import lam.Mower;
 import lam.enums.Direction;
 import lam.enums.Instruction;
 import lam.records.Coordinate;
 import lam.records.Lawn;
+import lam.records.MowerState;
 import lam.records.MowingSession;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +35,24 @@ public class InputParser {
         wholeInput = InputManipulator.validateInput(wholeInput);
         Lawn lawn = convertLawnString(wholeInput);
         List<Mower> mowers = convertMowerStrings(wholeInput, lawn);
-        return new MowingSession(lawn, mowers);
+        return validateSession(new MowingSession(lawn, mowers));
+    }
+
+    // TODO: spin off
+    public static @NotNull MowingSession validateSession(MowingSession session) {
+        List<MowerState> firstStates = session.mowers()
+                .parallelStream()
+                .map(m -> m.firstState())
+                .collect(Collectors.toList());
+        List<MowerState> overlaps = new CollisionDetector().isThereACollision(firstStates);
+        if (!overlaps.isEmpty()) {
+            throw new IllegalArgumentException("Two mowers are on the same starting point: \n" +
+                    overlaps.parallelStream()
+                            .map(MowerState::coord)
+                            .map(Coordinate::toString)
+                            .reduce(" ", String::concat));
+        }
+        return session;
     }
 
     private static @NotNull List<Mower> convertMowerStrings(@NotNull String input, @NotNull Lawn lawn) {

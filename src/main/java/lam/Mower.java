@@ -38,21 +38,11 @@ public class Mower {
     /**
      * The mower will go to the position it was on this turn.
      * It will reprocess every instructions after those that led it there.
-     * @param turnFrom
      */
-    public synchronized void processFrom(int turnFrom) {
-        if (turnFrom < 0)
-            throw new IllegalArgumentException("Turn should not be < 0");
-        if (turnFrom >= states.size()) {
-            LOG.warn("your are trying to process turns that are still to happen... Great Scott!");
-            return;
-        }
+    public synchronized void processFromLastState() {
+        MowerState nextState = states.get(states.size() - 1);
 
-        MowerState nextState = states.get(turnFrom);
-        states.removeAll(new LinkedList<>(states.subList(turnFrom, states.size()))); // remove from turn and add it later. So if we remove everything the initial state is kept
-        states.add(nextState);
-
-        while (nextState.nextInstructionCpt() < instructions.size()) {
+        while (nextState.nextInstructionCpt() < instructions.size() && !instructions.isEmpty()) {
             var instruction = instructions.get(nextState.nextInstructionCpt());
             var stateCandidate = instruction.exec.apply(states.get(states.size() - 1));
             if (isValid(stateCandidate))
@@ -63,23 +53,27 @@ public class Mower {
         }
     }
 
-    public void removeInstruction(int i) {
-        if (i < 0 || i >= instructions.size())
-            throw new IllegalArgumentException("Cannot remove instruction " + i + " number of instructions: " + instructions.size());
-        instructions.remove(i);
-    }
-
-    private boolean isValid(@NotNull MowerState stateCandidate) {
-        return CoordinateValidation.isValid(stateCandidate.coord(), lawn);
+    /**
+     * It will remove everything from the invalid state and skip the invalid instruction
+     */
+    public synchronized void skipInstruction(MowerState invalidState) {
+        // TODO: move to set
+        int indexOfFirstInvalidState = states.indexOf(invalidState);
+        states.subList(indexOfFirstInvalidState, states.size()).clear();
+        var stateWithInstructionToSkip = states.get(states.size() - 1);
+        states.set(states.size() - 1, new MowerState(stateWithInstructionToSkip.dir(), stateWithInstructionToSkip.coord(), stateWithInstructionToSkip.nextInstructionCpt() + 1, index));
     }
 
     @Unmodifiable
-    public List<MowerState> getStates() {
+    public synchronized List<MowerState> getStates() {
         // what if it gets modified when processFrom is called...
         return Collections.unmodifiableList(states); // ho gosh that accessibility management...
     }
-    public @NotNull MowerState lastState() {
+    public synchronized @NotNull MowerState lastState() {
         return states.get(states.size() - 1);
+    }
+    public synchronized @NotNull MowerState firstState() {
+        return states.get(0);
     }
 
     @Override
@@ -96,4 +90,7 @@ public class Mower {
         return Objects.hash(instructions, lawn);
     }
 
+    private boolean isValid(@NotNull MowerState stateCandidate) {
+        return CoordinateValidation.isValid(stateCandidate.coord(), lawn);
+    }
 }
