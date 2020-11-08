@@ -31,9 +31,25 @@ You can either run it with:
 - `no arguments` : `java --enable-preview -jar deliverables/chosen.jar`. It will then run the given example and any file located at `/opt/lawn_and_mower/inputs/`
 - `file as argument` : add for example `"test_inputs/huge_lawn"` after the previous run command. Will **not** run files located at the default input folder
 
+### rest api
+
+The very cleverly named branch put-api-to-rest contains a version with a basic rest api.
+
+It deploys to port `8080` on `/mow`
+
+You add a json representing the test you want to run, and it gets added to the pool.
+
+When 
+
 ### Docker
 
 You can run the docker image and mount a volume pointing to your files: `docker run -v path_inputs:/opt/lawn_and_mower/inputs/ julienbe/lawn-and-mower:1.0.0`
+
+The 1.1.0 image is the one running with the rest api and not the cli. It deploys internally on port `8080`. Run it with `docker run -p 25852:8080 julienbe/lawn-and-mower:1.1.0`
+
+- Add an input to the list: `curl -X POST -H 'Content-Type: application/json' -i http://localhost:25852/mow --data '{"lawn":"5 5","mowers":[{"coord":"1 2 N","instructions":"LFLFLFLFF"},{"coord":"3 3 E","instructions":"FFRFFRFRRF"}]}'`
+- Get the result with a simple `curl http://localhost:25852/mow`
+
 
 ### Output
 
@@ -47,6 +63,7 @@ For the docker version, you can also mount it as a volume with `docker run -v pa
 
 - build : https://asciinema.org/a/1eSrZO4a8Oo4qjIabejVc7S9M
 - docker : https://asciinema.org/a/v68vTeqRZAsDyGdiaa2cWjVKJ
+- rest : https://asciinema.org/a/9p396VPRRJzOIxPjocHJbSnS5
 - jar : https://asciinema.org/a/4fSvq8oOU4CMJM1gC7Ie6kcoU
 - moo.sh : https://asciinema.org/a/WHB3u482XA7s50Pj6EMYxoHAh
 
@@ -142,12 +159,12 @@ Result
 
 - add picocli
 - add option to write result at the end of file
-- add useful rest endpoint 
+- ~~add~~ useful ~~rest endpoint~~ 
 - check on non linux machines
 - deploy
 - check not logged to dockerhub
 - ~~asciinema~~
-- deliverables
+- ~~deliverables~~
 - ~~bench~~
 - ~~damn regex doing a stackoverflow~~
 - add proper test for session creator
