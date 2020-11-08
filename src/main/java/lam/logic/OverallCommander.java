@@ -2,6 +2,7 @@ package lam.logic;
 
 import lam.records.MowerState;
 import lam.records.MowingSession;
+import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class OverallCommander {
+    private static final Logger LOG = Logger.getLogger(OverallCommander.class);
     private final MowingSession session;
 
     public OverallCommander(MowingSession session) {
@@ -17,7 +19,10 @@ public class OverallCommander {
     }
 
     public List<String> exec() {
+        long startTime = System.currentTimeMillis();
         List<MowerState> allCollidingStates;
+        int bumps = -1;
+
         do {
             session.mowers()
                     .parallelStream()
@@ -39,12 +44,17 @@ public class OverallCommander {
             allCollidingStates
                     .parallelStream()
                     .forEach(mowerState -> handleCollisionState(mowerState, session.mowers()));
+            bumps++;
         } while (!allCollidingStates.isEmpty());
-        return session.mowers()
+
+        var lastStatesAsString = session.mowers()
                 .stream()
                 .map(Mower::lastState)
                 .map(state -> state.coord().x() + " " + state.coord().y() + " " + state.dir())
                 .collect(Collectors.toList());
+
+        LOG.info("Execution time: " + (System.currentTimeMillis() - startTime) + " with " + bumps + " bumps");
+        return lastStatesAsString;
     }
 
     private void handleCollisionState(MowerState mowerState, List<Mower> mowers) {

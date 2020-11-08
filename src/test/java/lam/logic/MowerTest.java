@@ -1,7 +1,6 @@
-package lam;
+package lam.logic;
 
 import lam.enums.Direction;
-import lam.logic.Mower;
 import lam.records.Coordinate;
 import lam.records.Lawn;
 import lam.records.MowerState;
@@ -10,7 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static lam.enums.Instruction.*;
+import static lam.enums.Instruction.F;
+import static lam.enums.Instruction.R;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

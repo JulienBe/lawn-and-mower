@@ -2,13 +2,15 @@ package lam;
 
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
-import lam.logic.InputManipulator;
-import lam.logic.InputParser;
 import lam.logic.OverallCommander;
+import lam.logic.SessionCreatorAutomata;
 import lam.records.MowingSession;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +23,7 @@ public class CliEntryPoint implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception {
-        LOG.info("Starting LAWN AND MOWER!");
+        LOG.info("\n\tStarting LAWN AND MOWER!");
         LOG.info("CLI MODE");
         LOG.info("Args : " + Arrays.toString(args));
         List<String> files = new ArrayList<>();
@@ -30,29 +32,22 @@ public class CliEntryPoint implements QuarkusApplication {
         } else {
             Arrays.stream(args)
                     .parallel()
-                    .forEach(this::runFile);
+                    .forEach(arg ->
+                            arg.lines().map(this::runFile).forEach(files::add));
         }
-        files
-                .stream()
-                .filter(this::validateInput)
-                .forEach(this::runCommander);
+        files.forEach(this::runCommander);
         return 0;
     }
 
-    private boolean validateInput(String s) {
-        try {
-            InputManipulator.validateInput(s);
-        } catch (IllegalArgumentException e) {
-            LOG.error("Input between those ''' was invalid \n'''" + s + "'''\n ", e);
-        }
-        return true;
-    }
-
     private void runCommander(String s) {
-        LOG.debug("Commander starting on " + s);
-        MowingSession session = InputParser.init(s);
-        OverallCommander commander = new OverallCommander(session);
-        LOG.info("FOR INPUT \n" + s + "\n\n" + processExecResult(commander));
+        try {
+            LOG.debug("Commander starting on " + s);
+            MowingSession session = new SessionCreatorAutomata().processInput(s);
+            OverallCommander commander = new OverallCommander(session);
+            LOG.info("\n" + processExecResult(commander));
+        } catch (Exception e) {
+            LOG.error("Unexpected issue during processing of " + s);
+        }
     }
 
     private String processExecResult(OverallCommander commander) {
@@ -75,7 +70,22 @@ public class CliEntryPoint implements QuarkusApplication {
         throw new IllegalArgumentException(fileName + " was obviously an incorrect file name ! :) ");
     }
 
-    private void runFile(String file) {
+    private String runFile(String file) {
+        file = file.trim();
         LOG.info("Running file " + file);
+        if (file != null) {
+            try {
+                Path path = Paths.get(file);
+                if (path != null) {
+                    return new String(Files.readAllBytes(path));
+                } else {
+                    throw new Throwable("Path was null");
+                }
+            } catch (Throwable e) {
+                LOG.error("There was an issue read file", e);
+            }
+        }
+        LOG.error("Return invalid and will be discarded");
+        return "invalid and will be discarded";
     }
 }

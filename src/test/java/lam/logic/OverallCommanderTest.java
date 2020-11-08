@@ -1,9 +1,6 @@
-package lam;
+package lam.logic;
 
 import lam.enums.Direction;
-import lam.logic.Mower;
-import lam.logic.OverallCommander;
-import lam.logic.TestUtilities;
 import lam.records.Coordinate;
 import lam.records.Lawn;
 import lam.records.MowingSession;
@@ -12,10 +9,20 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static lam.enums.Instruction.*;
+import static lam.enums.Instruction.F;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OverallCommanderTest {
+
+    @Test
+    void bumperMowers() {
+        var fileContent = new TestUtilities().getValid("bumper_mowers");
+        var result = new OverallCommander(new SessionCreatorAutomata().processInput(fileContent)).exec();
+        assertEquals("0 6 S", result.get(0));
+        assertEquals("0 5 S", result.get(1));
+        assertEquals("5 5 N", result.get(2));
+        assertEquals("4 4 W", result.get(3));
+    }
 
     @Test
     void givenExample() {

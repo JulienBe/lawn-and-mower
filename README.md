@@ -12,6 +12,13 @@ You need at least Java 15 to compile or run it
 
 `mvn compile quarkus:dev` will compile into dev mode for fast rerun when you modify something
 
+`mvn compile quarkus:dev -Dquarkus.args="path_to_file` will process your file.  
+Just press `enter` in the terminal to rerun it
+
+You can also process multiple files, enter a multiline string. See `mow.sh`
+
+Tips: you can generate random data with the regex at https://onlinerandomtools.com/generate-random-data-from-regexp
+
 ### CLI mode
 
 
@@ -47,8 +54,6 @@ Different mowers may **not occupy the same space at the same time**,
  and if a mower receives a **move forward** instruction that would cause it to **run into another mower**,
  the move forward instruction is **silently discarded**.
  
-`assumption here: as seen later, moves can be run in //, they would both not move to this space ?`
-
 Your simulation will be run on a machine with multiple CPUs so multiple **mowers should be processed simultaneously** in order to speed up the overall execution time.
 
 ## Inputs
@@ -115,3 +120,6 @@ Result
 - check not logged to dockerhub
 - asciinema
 - deliverables
+- ~~bench~~
+- ~~damn regex doing a stackoverflow~~
+- add proper test for session creator

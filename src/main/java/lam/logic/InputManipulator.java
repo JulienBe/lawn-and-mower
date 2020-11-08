@@ -18,14 +18,21 @@ public class InputManipulator {
     private static final String MOWER_REGEX = COORDS_REGEX + SEPARATOR + DIR_REGEX;
     private static final String INSTRUCTIONS_REGEX = "^[L|R|F]+$";
     private static final String NEW_LINE_REGEX = "\\R";
-    private static final Pattern validContentPattern = Pattern.compile(COORDS_REGEX + "(" + NEW_LINE_REGEX + MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX + ")+", Pattern.MULTILINE);
-    private static final Pattern lawnPattern = Pattern.compile(COORDS_REGEX + NEW_LINE_REGEX, Pattern.MULTILINE);
+    private static final Pattern lawnPattern = Pattern.compile(COORDS_REGEX);
+    private static final Pattern mowerLine1Pattern = Pattern.compile(MOWER_REGEX);
+    private static final Pattern mowerLine2Pattern = Pattern.compile(INSTRUCTIONS_REGEX);
     private static final Pattern mowerPattern = Pattern.compile(MOWER_REGEX + NEW_LINE_REGEX + INSTRUCTIONS_REGEX, Pattern.MULTILINE);
     private static final Pattern coordPattern = Pattern.compile(COORD_REGEX, Pattern.MULTILINE);
     private static final Pattern dirPattern = Pattern.compile(DIR_REGEX, Pattern.MULTILINE);
 
     private InputManipulator() {}
 
+    public static @NotNull String extractMowerLine1(@NotNull String s) {
+        return getFirstOnList(extractAllMatching(s, mowerLine1Pattern));
+    }
+    public static @NotNull String extractMowerLine2(@NotNull String s) {
+        return getFirstOnList(extractAllMatching(s, mowerLine2Pattern));
+    }
     public static @NotNull String extractDirection(@NotNull String s) {
         return getFirstOnList(extractAllMatching(s, dirPattern));
     }
@@ -35,26 +42,9 @@ public class InputManipulator {
     public static @NotNull List<String> extractCoord(@NotNull String s) {
         return extractAllMatching(s, coordPattern);
     }
-    public static @NotNull List<String> extractMowers(@NotNull String s) {
-        return extractAllMatching(s, mowerPattern);
-    }
 
     private static @NotNull String getFirstOnList(@NotNull List<String> list) {
         return cleanInput(list.get(0));
-    }
-
-    /**
-     * throws and log an error if it's invalid
-     */
-    public static @NotNull String validateInput(@NotNull String wholeInput) {
-        wholeInput = cleanInput(wholeInput);
-        if (splitPerNewLine(getFirstOnList(extractAllMatching(wholeInput, validContentPattern))).length == splitPerNewLine(wholeInput).length)
-            return wholeInput;
-        throw illegalString(wholeInput, "Sorry, your input is invalid" + patternErrorStr(validContentPattern));
-    }
-
-    public static @NotNull String[] splitPerNewLine(String s) {
-        return s.split(NEW_LINE_REGEX);
     }
 
     private static @NotNull List<String> extractAllMatching(@NotNull String s, @NotNull Pattern pattern) {
