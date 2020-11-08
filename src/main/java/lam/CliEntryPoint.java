@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@QuarkusMain
 public class CliEntryPoint implements QuarkusApplication {
 
     private static final Logger LOG = Logger.getLogger(CliEntryPoint.class);
