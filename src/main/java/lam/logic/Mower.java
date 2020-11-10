@@ -2,7 +2,6 @@ package lam.logic;
 
 import lam.enums.Direction;
 import lam.enums.Instruction;
-import lam.logic.validation.CoordinateValidation;
 import lam.records.Coordinate;
 import lam.records.Lawn;
 import lam.records.MowerState;
@@ -30,7 +29,7 @@ public class Mower {
         this.lawn = lawn;
         this.index = index;
         var initialState = new MowerState(dir, initialCoordinate, 0, index);
-        if (!isValid(initialState))
+        if (StateValidator.isOOB(initialState, lawn))
             throw new IllegalArgumentException("The mower has been initialized outside of the lawn.\n Given: " + initialCoordinate + "\n on lawn " + lawn);
         states.add(initialState);
     }
@@ -44,11 +43,7 @@ public class Mower {
 
         while (nextState.nextInstructionCpt() < instructions.size() && !instructions.isEmpty()) {
             var instruction = instructions.get(nextState.nextInstructionCpt());
-            var stateCandidate = instruction.exec.apply(states.get(states.size() - 1));
-            if (isValid(stateCandidate))
-                nextState = stateCandidate;
-            else
-                nextState = new MowerState(nextState.dir(), nextState.coord(), nextState.nextInstructionCpt() + 1, index);
+            nextState = instruction.exec.apply(states.get(states.size() - 1));
             states.add(nextState);
         }
     }
@@ -56,24 +51,27 @@ public class Mower {
     /**
      * It will remove everything from the invalid state and skip the invalid instruction
      */
-    public synchronized void skipInstruction(MowerState invalidState) {
+    public synchronized void skipInstruction(MowerState invalidCreation) {
         // TODO: move to set
-        int indexOfFirstInvalidState = states.indexOf(invalidState);
+        rollbackTo(invalidCreation);
+        var state = states.get(states.size() - 1);
+        states.set(states.size() - 1, new MowerState(state.dir(), state.coord(), state.nextInstructionCpt() + 1, index));
+    }
+
+    public synchronized void rollbackTo(MowerState state) {
+        int indexOfFirstInvalidState = states.indexOf(state);
         states.subList(indexOfFirstInvalidState, states.size()).clear();
-        var stateWithInstructionToSkip = states.get(states.size() - 1);
-        states.set(states.size() - 1, new MowerState(stateWithInstructionToSkip.dir(), stateWithInstructionToSkip.coord(), stateWithInstructionToSkip.nextInstructionCpt() + 1, index));
+        if (states.isEmpty())
+            states.add(state);
     }
 
     @Unmodifiable
     public synchronized List<MowerState> getStates() {
         // what if it gets modified when processFrom is called...
-        return Collections.unmodifiableList(states); // ho gosh that accessibility management...
+        return Collections.unmodifiableList(states);
     }
     public synchronized @NotNull MowerState lastState() {
         return states.get(states.size() - 1);
-    }
-    public synchronized @NotNull MowerState firstState() {
-        return states.get(0);
     }
 
     @Override
@@ -88,9 +86,5 @@ public class Mower {
     @Override
     public int hashCode() {
         return Objects.hash(instructions, lawn);
-    }
-
-    private boolean isValid(@NotNull MowerState stateCandidate) {
-        return CoordinateValidation.isValid(stateCandidate.coord(), lawn);
     }
 }
